@@ -1,7 +1,29 @@
 import streamlit as st
 import anthropic
+import os
+
 st.set_page_config(page_title="AWS Architecture Assistant", page_icon="☁️")
+
+# Password protection
+def check_password():
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        st.title("🔐 Login")
+        password = st.text_input("Enter password", type="password")
+        if st.button("Login"):
+            if password == os.environ.get("APP_PASSWORD", "changeme"):
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Wrong password")
+        st.stop()
+
+check_password()
+
 st.title("☁️ AWS Architecture Assistant")
+
 client = anthropic.Anthropic()
 
 SYSTEM_PROMPT = """You are an expert AWS solutions architect. 
@@ -29,21 +51,17 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("Ask me about AWS architecture..."):
 
-    # 1. Show user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # 2. Add user message to history
     st.session_state.messages.append({
         "role": "user",
         "content": prompt
     })
 
-    # 3. Keep only last 10 messages
     if len(st.session_state.messages) > 10:
         st.session_state.messages = st.session_state.messages[-10:]
 
-    # 4. Call API and show response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = client.messages.create(
@@ -57,11 +75,9 @@ if prompt := st.chat_input("Ask me about AWS architecture..."):
             st.session_state.total_tokens["output"] += response.usage.output_tokens
             st.markdown(assistant_message)
 
-    # 5. Add assistant response to history
     st.session_state.messages.append({
         "role": "assistant",
         "content": assistant_message
     })
 
-    # 6. Rerun to update sidebar token counts
     st.rerun()
