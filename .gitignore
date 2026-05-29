@@ -1,0 +1,18 @@
+# Virtual environment - never commit this
+venv/
+
+# Environment variables - never commit API keys
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code settings
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini
