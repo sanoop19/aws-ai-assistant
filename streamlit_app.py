@@ -1,12 +1,7 @@
 import streamlit as st
 import anthropic
-from dotenv import load_dotenv
-
-load_dotenv()
-
 st.set_page_config(page_title="AWS Architecture Assistant", page_icon="☁️")
 st.title("☁️ AWS Architecture Assistant")
-
 client = anthropic.Anthropic()
 
 SYSTEM_PROMPT = """You are an expert AWS solutions architect. 
